@@ -1,0 +1,58 @@
+---
+- name: Download baztian/vzborg script
+  get_url:
+    url: "{{ vzborg_source }}/vzborg"
+    dest: /usr/local/bin/vzborg
+    mode: '0755'
+- name: Ensures /etc/vzborg exists
+  file:
+    path: /etc/vzborg
+    state: directory
+    mode: 0700
+    owner: root
+- name: Check if default config exists
+  stat:
+    path: /etc/vzborg/default
+  register: default_config
+- name: Download default config
+  get_url:
+    url: "{{ vzborg_source }}/default"
+    dest: /etc/vzborg/default
+    mode: '0600'
+  when: not default_config.stat.exists
+- name: Generate and replace borg passphrase for VzBorg default config
+  ansible.builtin.replace:
+    path: /etc/vzborg/default
+    regexp: 'MySecretBorgRepositoryPassphrase'
+    replace: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', '!#%()+,-.:;<=>@[]_{|}~'], length=32) }}"
+- name: Add NOTIFY_TO to default config so that root gets a mail on backup completion
+  ansible.builtin.lineinfile:
+    path: /etc/vzborg/default
+    regexp: '^NOTIFY_TO='
+    line: 'NOTIFY_TO="root"'
+    mode: '0600'
+- name: Comment out VZBORG_REPO line in default config
+  ansible.builtin.lineinfile:
+    path: /etc/vzborg/default
+    backrefs: yes
+    regexp: '^(VZBORG_REPO=.*)$'
+    line: '#\1'
+    mode: '0600'
+- name: Set ENCRYPTION_MODE in default config
+  ansible.builtin.lineinfile:
+    path: /etc/vzborg/default
+    regexp: '^ENCRYPTION_MODE='
+    line: 'ENCRYPTION_MODE="{{ vzborg_init_encryption }}"'
+    mode: '0600'
+  when: vzborg_init_encryption
+- name: Add Configurations
+  copy:
+    content: |
+      ########################################################################
+      # File managed by Ansible
+      # Your changes will be overwritten.
+      ########################################################################
+      {{ item.value }}
+    dest: "/etc/vzborg/{{ item.key }}"
+    mode: 0600
+  loop: "{{ vzborg_configs | dict2items }}"

@@ -1,0 +1,14 @@
+########################################################################
+# File managed by Ansible
+# Your changes will be overwritten.
+########################################################################
+[Unit]
+Description=Run vzborg backup
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=3h
+
+[Install]
+WantedBy=timers.target

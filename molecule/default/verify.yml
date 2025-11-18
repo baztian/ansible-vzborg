@@ -1,0 +1,24 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  tasks:
+  - name: Register borgbackup version
+    command: borg --version
+    changed_when: False
+    register: borgbbackup_version_cmd
+  - name: Borgbackup should be at least 1.1.x
+    assert:
+      that:
+        - "'{{ borgbbackup_version_cmd.stdout | regex_replace('borg\\w*\\s+(.*)', '\\1') }}' is version('1.1.0', '>=')"
+    changed_when: False
+  - name: Register borgmatic version
+    command: borgmatic --version
+    register: borgbmatic_version_cmd
+    changed_when: False
+  - name: Borgmatic should be at least 1.5.x
+    assert:
+      that:
+        - borgbmatic_version_cmd.stdout is version('1.5.0', '>=')
+    changed_when: False
