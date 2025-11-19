@@ -49,7 +49,7 @@
     regexp: '^ENCRYPTION_MODE='
     line: 'ENCRYPTION_MODE="{{ vzborg_init_encryption }}"'
     mode: '0600'
-  when: vzborg_init_encryption
+  when: vzborg_init_encryption | length > 0
 - name: Add Configurations
   copy:
     content: |

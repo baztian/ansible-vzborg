@@ -1,6 +1,6 @@
 ---
 # defaults to repokey-blake2 or whatever is set in vzborg default config
-vzborg_init_encryption:
+vzborg_init_encryption: ""
 vzborg_configs: {}
 vzborg_timer: daily
 vzborg_source: https://github.com/baztian/vzborg/raw/refs/heads/master
