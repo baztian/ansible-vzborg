@@ -10,7 +10,7 @@ After=network-online.target
 # Prevent vzborg from running unless the machine is plugged into power. Remove this line if you
 # want to allow vzborg to run anytime.
 ConditionACPower=true
-ConditionFileNotEmpty=/etc/vzborg/config.yaml
+ConditionFileNotEmpty=/etc/vzborg/default
 
 [Service]
 Type=oneshot
