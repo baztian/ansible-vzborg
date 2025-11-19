@@ -10,8 +10,10 @@
     dest: /etc/systemd/system/vzborg.service
     mode: '0644'
   with_first_found:
-    - "vzborg-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.service.j2"
-    - "vzborg-{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.service.j2"
+    - "vzborg-{{ ansible_distribution }}-\
+      {{ ansible_distribution_major_version }}.service.j2"
+    - "vzborg-{{ ansible_os_family }}-\
+      {{ ansible_distribution_major_version }}.service.j2"
     - "vzborg.service.j2"
 - name: Install vzborg systemd timer file
   template:
@@ -23,4 +25,4 @@
     name: vzborg.timer
     daemon_reload: true
     state: started
-    enabled: yes
+    enabled: true

@@ -1,15 +1,19 @@
 ---
 - name: Converge
   hosts: all
-  become: yes
+  become: true
 
   tasks:
     - name: 'Run role'  # noqa role-name[path]
       ansible.builtin.include_role:
-        name: "../../../{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+        name: >-
+          ../../../{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') |
+          basename }}
     - name: Include this role
-      include_role:
-        name: "../../../{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      include_role:  # noqa role-name[path]
+        name: >-
+          ../../../{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') |
+          basename }}
       vars:
         vzborg_configs:
           local: |

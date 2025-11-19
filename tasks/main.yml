@@ -1,13 +1,13 @@
 ---
 - name: Update apt cache.
   apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
 - name: Install borgbackup and jq package
   apt:
     pkg:
       - borgbackup
-      - jq # needed for vzborg-tagged-vms.sh wrapper srcipt
+      - jq  # needed for vzborg-tagged-vms.sh wrapper srcipt
 - name: Install VzBorg installation files
   import_tasks: vzborg-install.yml
 - name: Install sysctl jobs
