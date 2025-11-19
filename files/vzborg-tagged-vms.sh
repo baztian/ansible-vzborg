@@ -21,7 +21,7 @@ for config_file in "$CONFIG_DIR"/*; do
         continue
     fi
     echo "Running vzborg with config: $config_name for VMs: $VM_IDS"
-    if ! /usr/local/bin/vzborg -i $VM_IDS -c "$config_name"; then
+    if ! /usr/local/bin/vzborg backup -i "$VM_IDS" -c "$config_name"; then
         echo "Error: vzborg failed for config $config_name" >&2
         EXIT_CODE=1
         # Continue to next config instead of exiting immediately
