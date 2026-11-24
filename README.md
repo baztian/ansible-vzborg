@@ -7,6 +7,9 @@ with some proper configuration to make sure backups are carried out on a schedul
 
 It carries out the backup for all configurations except `default`. Only
 vms tagged with `backup` or `backup-<configname>` are backed up.
+The role initializes each configured repository that defines `VZBORG_REPO`.
+It uses that config's passphrase and encryption mode. Existing repositories are
+left unchanged; initialization errors, including connection failures, stop the play.
 
 Please make sure to create a backup from the repo key and password after setting
 up! E.g. for a config file `local`

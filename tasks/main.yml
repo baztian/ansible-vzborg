@@ -10,5 +10,7 @@
       - jq  # needed for vzborg-tagged-vms.sh wrapper srcipt
 - name: Install VzBorg installation files
   import_tasks: vzborg-install.yml
+- name: Initialize configured Borg repositories
+  import_tasks: vzborg-repo-init.yml
 - name: Install sysctl jobs
   import_tasks: vzborg-job.yml

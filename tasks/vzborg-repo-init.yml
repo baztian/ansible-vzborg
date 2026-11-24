@@ -1,0 +1,36 @@
+---
+- name: Initialize Borg repository for each VzBorg config
+  ansible.builtin.shell:
+    cmd: |
+      set -eo pipefail
+      . /etc/vzborg/default
+      . {{ ('/etc/vzborg/' ~ item.key) | quote }}
+
+      if [ -z "${VZBORG_REPO:-}" ]; then
+        exit 0
+      fi
+
+      : "${VZBORG_PASSPHRASE:?VZBORG_PASSPHRASE must be set}"
+      : "${ENCRYPTION_MODE:?ENCRYPTION_MODE must be set}"
+      export BORG_PASSPHRASE="$VZBORG_PASSPHRASE"
+
+      if output=$(borg init --encryption "$ENCRYPTION_MODE" \
+        "$VZBORG_REPO" 2>&1); then
+        printf '%s\n' "$output"
+        printf 'VZBORG_REPO_CREATED\n'
+      else
+        result=$?
+        if printf '%s\n' "$output" | grep -Fq \
+          'A repository already exists at '; then
+          printf '%s\n' "$output"
+        else
+          printf '%s\n' "$output" >&2
+          exit "$result"
+        fi
+      fi
+    executable: /bin/bash
+  loop: "{{ vzborg_configs | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: vzborg_repo_init
+  changed_when: "'VZBORG_REPO_CREATED' in vzborg_repo_init.stdout"

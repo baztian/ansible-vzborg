@@ -2,6 +2,13 @@
 - name: Converge
   hosts: all
   become: true
+  vars:
+    vzborg_configs:
+      local: |
+        VZBORG_REPO=foobar
+      nas: |
+        VZBORG_REPO=baz
+        FOO=BAR
 
   tasks:
     - name: 'Run role'  # noqa role-name[path]
@@ -14,10 +21,3 @@
         name: >-
           ../../../{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') |
           basename }}
-      vars:
-        vzborg_configs:
-          local: |
-            VZBORG_REPO=foobar
-          nas: |
-            VZBORG_REPO=baz
-            FOO=BAR
