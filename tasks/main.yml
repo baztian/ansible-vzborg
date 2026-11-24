@@ -12,5 +12,7 @@
   import_tasks: vzborg-install.yml
 - name: Initialize configured Borg repositories
   import_tasks: vzborg-repo-init.yml
+- name: Configure Uptime Kuma monitoring
+  import_tasks: vzborg-kuma.yml
 - name: Install sysctl jobs
   import_tasks: vzborg-job.yml

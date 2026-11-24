@@ -1,0 +1,27 @@
+#!/bin/bash
+
+config=/etc/vzborg/kuma.env
+[[ -r "$config" ]] || exit 0
+. "$config"
+
+status="${1:-}"
+repo="${2:-}"
+[[ -n "${KUMA_URL:-}" && -n "$status" && -n "$repo" ]] || exit 0
+
+for matcher_name in ${!REPO_@}; do
+  matcher="${!matcher_name}"
+  token_name="TOKEN_${matcher_name#REPO_}"
+  token="${!token_name}"
+  [[ -n "$token" ]] || continue
+
+  # Keep the matcher unquoted so configured Bash glob patterns remain active.
+  if [[ "$repo" == $matcher ]]; then
+    curl -fsS -m 10 --retry 3 -G \
+      --data-urlencode "status=$status" \
+      --data-urlencode "msg=vzborg $status: $repo" \
+      "${KUMA_URL%/}/api/push/$token"
+    exit $?
+  fi
+done
+
+exit 0

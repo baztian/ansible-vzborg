@@ -1,0 +1,68 @@
+---
+- name: Collect configured Uptime Kuma repository tokens
+  set_fact:
+    _vzborg_kuma_repositories: >-
+      {{
+        (vzborg_kuma.repositories | default({}) | dict2items)
+        | selectattr('value.token', 'defined')
+        | selectattr('value.token')
+        | list
+      }}
+  changed_when: false
+  no_log: true
+
+- name: Validate Uptime Kuma URL
+  assert:
+    that:
+      - vzborg_kuma.url is defined
+      - vzborg_kuma.url | string | length > 0
+    fail_msg: >-
+      vzborg_kuma.url is required when repository tokens are configured.
+  when: _vzborg_kuma_repositories | length > 0
+
+- name: Validate Uptime Kuma repository matchers
+  assert:
+    that:
+      - item.key is match('^[A-Z][A-Z0-9_]*$')
+      - item.value.matcher is defined
+      - item.value.matcher | string | length > 0
+    fail_msg: >-
+      Each configured Kuma token needs a valid uppercase key and
+      non-empty matcher.
+  loop: "{{ _vzborg_kuma_repositories }}"
+  when: _vzborg_kuma_repositories | length > 0
+  no_log: true
+
+- name: Install Uptime Kuma dependencies
+  apt:
+    name: curl
+    state: present
+  when: _vzborg_kuma_repositories | length > 0
+
+- name: Install Uptime Kuma environment file
+  template:
+    src: vzborg-kuma.env.j2
+    dest: /etc/vzborg/kuma.env
+    owner: root
+    group: root
+    mode: '0600'
+  no_log: true
+  when: _vzborg_kuma_repositories | length > 0
+
+- name: Install Uptime Kuma push script
+  copy:
+    src: vzborg-kuma-push
+    dest: /usr/local/sbin/vzborg-kuma-push
+    owner: root
+    group: root
+    mode: '0750'
+  when: _vzborg_kuma_repositories | length > 0
+
+- name: Remove disabled Uptime Kuma files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/vzborg/kuma.env
+    - /usr/local/sbin/vzborg-kuma-push
+  when: _vzborg_kuma_repositories | length == 0
