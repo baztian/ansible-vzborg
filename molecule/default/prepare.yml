@@ -5,6 +5,6 @@
   tasks:
     - name: Check Ansible temporary directory
       raw: >-
-        id; ls -ld /tmp /tmp/.ansible-ansible /tmp/.ansible-ansible/tmp;
-        test -w /tmp/.ansible-ansible/tmp
+        id; ls -ld /var/tmp /var/tmp/ansible-tmp;
+        test -w /var/tmp/ansible-tmp
       changed_when: false
