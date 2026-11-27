@@ -16,6 +16,8 @@ platforms:
 provisioner:
   name: ansible
   log: true
+  playbooks:
+    prepare: prepare.yml
   inventory:
     host_vars:
       instance:
