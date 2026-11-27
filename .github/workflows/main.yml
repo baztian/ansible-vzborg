@@ -14,9 +14,11 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: yaml-lint
         uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .yamllint
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v6.22.2
   test:
@@ -27,6 +29,10 @@ jobs:
           - ubuntu2204
           - debian12
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: molecule
         uses: robertdebock/molecule-action@2.6.8
+        with:
+          namespace: molecule
+          image: ubuntu
+          tag: '22.04'

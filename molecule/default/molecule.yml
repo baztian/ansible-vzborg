@@ -3,26 +3,26 @@ dependency:
   name: galaxy
 driver:
   name: docker
-  options:
-    # options relevant if started with molecule
-    # `create -d delegated` to apply locally
-    managed: false
-    ansible_connection_options:
-      ansible_connection: local
 platforms:
   - name: instance
-    image: docker-ubuntu2404-ansible:latest
-    command: ""
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    pre_build_image: true
+    command: /lib/systemd/systemd
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+    environment:
+      BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK: 'yes'
     cgroupns_mode: host
     privileged: true
 provisioner:
   name: ansible
   log: true
+  playbooks:
+    prepare: prepare.yml
   inventory:
     host_vars:
       instance:
         ansible_user: ansible
+        ansible_remote_tmp: /var/tmp/ansible-tmp
 verifier:
   name: ansible

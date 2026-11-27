@@ -1,0 +1,10 @@
+---
+- name: Prepare Molecule instance
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check Ansible temporary directory
+      raw: >-
+        id; ls -ld /var/tmp /var/tmp/ansible-tmp;
+        test -w /var/tmp/ansible-tmp
+      changed_when: false

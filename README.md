@@ -10,6 +10,9 @@ vms tagged with `backup` or `backup-<configname>` are backed up.
 The role initializes each configured repository that defines `VZBORG_REPO`.
 It uses that config's passphrase and encryption mode. Existing repositories are
 left unchanged; initialization errors, including connection failures, stop the play.
+For Borg 1.x, the role replaces each repository's local `chunks.archive.d` cache
+directory with an empty file to prevent archive-chunk cache growth. Borg 2.x is
+left unchanged; set `BORG_USE_CHUNKS_ARCHIVE=no` in VzBorg's default config there.
 
 Please make sure to create a backup from the repo key and password after setting
 up! E.g. for a config file `local`
