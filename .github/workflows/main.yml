@@ -14,7 +14,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: yaml-lint
         uses: ibiqlik/action-yamllint@v3
       - name: Run ansible-lint
@@ -27,6 +27,6 @@ jobs:
           - ubuntu2204
           - debian12
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: molecule
         uses: robertdebock/molecule-action@2.6.8
