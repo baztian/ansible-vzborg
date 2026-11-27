@@ -5,7 +5,7 @@ driver:
   name: docker
 platforms:
   - name: instance
-    image: docker-ubuntu2404-ansible:latest
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
     pre_build_image: true
     override_command: false
     volumes:
