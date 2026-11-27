@@ -32,3 +32,7 @@ jobs:
       - uses: actions/checkout@v7
       - name: molecule
         uses: robertdebock/molecule-action@2.6.8
+        with:
+          namespace: molecule
+          image: ubuntu
+          tag: '22.04'

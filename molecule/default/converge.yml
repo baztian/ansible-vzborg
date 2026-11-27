@@ -13,8 +13,8 @@
   tasks:
     - name: Check Ansible temporary directory
       raw: >-
-        id; ls -ld /tmp /tmp/.ansible-ansible
-        /tmp/.ansible-ansible/tmp; test -w /tmp/.ansible-ansible/tmp
+        id; ls -ld /tmp /tmp/.ansible-ansible /tmp/.ansible-ansible/tmp;
+        test -w /tmp/.ansible-ansible/tmp
       become: false
       changed_when: false
     - name: Create VzBorg config directory
