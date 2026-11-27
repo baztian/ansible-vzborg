@@ -23,9 +23,9 @@ provisioner:
   name: ansible
   log: true
   inventory:
-      host_vars:
-        instance:
-          ansible_user: ansible
-          ansible_remote_tmp: /tmp/.ansible/tmp
+    host_vars:
+      instance:
+        ansible_user: ansible
+        ansible_remote_tmp: /tmp/.ansible/tmp
 verifier:
   name: ansible
