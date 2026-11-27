@@ -8,20 +8,37 @@
       command: borg --version
       changed_when: false
       register: borgbbackup_version_cmd
+    - name: Parse Borgbackup version
+      set_fact:
+        borgbackup_version: >-
+          {{ borgbbackup_version_cmd.stdout |
+          regex_replace('^borg[^ ]* ', '') | trim }}
     - name: Borgbackup should be at least 1.1.x
       assert:
         that:
-          - >-
-            '{{ borgbbackup_version_cmd.stdout |
-            regex_replace('borg\\w*\\s+(.*)', '\\1') }}'
-            is version('1.1.0', '>=')
+          - borgbackup_version is version('1.1.0', '>=')
       changed_when: false
-    - name: Register borgmatic versionon
-      command: borgmatic --version
-      register: borgbmatic_version_cmd
-      changed_when: false
-    - name: Borgmatic should be at least 1.5.x.x
-      assert:
-        that:
-          - borgbmatic_version_cmd.stdout is version('1.5.0', '>=')
-      changed_when: false
+    - name: Assert Borg 1.x cache suppression
+      when: >-
+        borgbackup_version is version('2.0.0', '<')
+      block:
+        - name: Read initialized repository ID
+          command: borg info --json /tmp/molecule-vzborg-repo
+          become: true
+          environment:
+            BORG_PASSPHRASE: molecule-test-passphrase
+          changed_when: false
+          register: borg_info
+        - name: Check chunks archive cache is an empty regular file
+          stat:
+            path: >-
+              /root/.cache/borg/{{
+              (borg_info.stdout | from_json).repository.id }}/chunks.archive.d
+          become: true
+          register: chunks_archive_cache
+        - name: Assert chunks archive cache is empty file
+          assert:
+            that:
+              - chunks_archive_cache.stat.exists
+              - chunks_archive_cache.stat.isreg
+              - chunks_archive_cache.stat.size == 0

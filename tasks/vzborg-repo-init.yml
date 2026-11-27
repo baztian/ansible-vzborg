@@ -28,9 +28,38 @@
           exit "$result"
         fi
       fi
+
+      if [ "$ENCRYPTION_MODE" = none ]; then
+        export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK=yes
+      fi
+      borg_version=$(borg --version | sed -E 's/^borg[^ ]* ([^ ]+).*/\1/')
+      if [[ "$borg_version" == 2.* ]]; then
+        exit 0
+      fi
+
+      if ! cache_output=$(borg info --json --bypass-lock \
+        "$VZBORG_REPO" 2>&1); then
+        printf '%s\n' "$cache_output" >&2
+        exit 1
+      fi
+
+      cache_dir=$(borg info "$VZBORG_REPO" 2>&1 | \
+        sed -n 's/^Cache: //p' | head -n 1)
+      if [ -z "$cache_dir" ]; then
+        printf 'Unable to determine Borg cache path for %s\n' "$VZBORG_REPO" >&2
+        exit 1
+      fi
+
+      if [ -d "$cache_dir/chunks.archive.d" ]; then
+        printf 'VZBORG_CHUNKS_ARCHIVE_RESET\n'
+      fi
+      rm -rf -- "$cache_dir/chunks.archive.d"
+      touch "$cache_dir/chunks.archive.d"
     executable: /bin/bash
   loop: "{{ vzborg_configs | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
   register: vzborg_repo_init
-  changed_when: "'VZBORG_REPO_CREATED' in vzborg_repo_init.stdout"
+  changed_when: >-
+    'VZBORG_REPO_CREATED' in vzborg_repo_init.stdout or
+    'VZBORG_CHUNKS_ARCHIVE_RESET' in vzborg_repo_init.stdout
