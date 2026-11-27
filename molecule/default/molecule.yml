@@ -3,12 +3,6 @@ dependency:
   name: galaxy
 driver:
   name: docker
-  options:
-    # options relevant if started with molecule
-    # `create -d delegated` to apply locally
-    managed: false
-    ansible_connection_options:
-      ansible_connection: local
 platforms:
   - name: instance
     image: docker-ubuntu2404-ansible:latest
